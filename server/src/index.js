@@ -55,7 +55,7 @@ app.use((err, req, res, next) => {
 app.post('/upload', upload.single('file'), function (req, res, next) {
     res.json({
         code: 200,
-        message: "Upload successful!",
+        msg: "Upload successful!",
         data: {
             imgUrl: `/${req.file.filename}`
         }

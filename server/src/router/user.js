@@ -7,5 +7,6 @@ const controller = require(`../controllers/${fileName}`);
 router.put('/:id', controller.update)
 router.post('/login', controller.login);
 router.post('/register', controller.register);
+router.post('/updatePwd', controller.updatePwd);
 
 module.exports = router;

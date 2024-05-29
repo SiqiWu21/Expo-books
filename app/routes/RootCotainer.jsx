@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import COLORS from "../utils/Colors";
 import Login from "../pages/Login";
 import TabBar from "./BottomTabBar";
+import ChangePwd from "../pages/ChangePwd";
+import Userinfo from "../pages/Userinfo";
 
 export default function RootCotainer() {
   const Stack = createNativeStackNavigator();
@@ -14,6 +16,34 @@ export default function RootCotainer() {
           name="Login"
           component={Login}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChangePwd"
+          component={ChangePwd}
+          options={{
+            title: "Password Modification",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name="Userinfo"
+          component={Userinfo}
+          options={{
+            title: "User Profile",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
         />
         <Stack.Screen
           name="TabBar"

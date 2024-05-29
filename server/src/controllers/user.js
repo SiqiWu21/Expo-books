@@ -113,3 +113,48 @@ exports.update = async (req, res) => {
         data
     });
 };
+
+// Update password
+exports.updatePwd = async (req, res) => {
+    const userId = req.auth.id;
+    const {
+        oldPwd,
+        newPwd
+    } = req.body;
+    const user = await sequelize.models.user.findOne({
+        where: {
+            id: userId
+        },
+        raw: true
+    });
+    if (!user) {
+        res.json({
+            code: -1,
+            msg: "User ID that does not exist!",
+        });
+        return;
+    }
+    bcrypt.compare(oldPwd, user.pwd, async (err, result) => {
+        if (result == true) {
+            bcrypt.hash(newPwd, saltRounds, async (err, hashPassword) => {
+                const data = await sequelize.models.user.update({
+                    pwd: hashPassword
+                }, {
+                    where: {
+                        id: userId
+                    }
+                });
+                res.json({
+                    code: 200,
+                    msg: "Modified successfully!",
+                    data
+                });
+            });
+        } else {
+            res.json({
+                code: -1,
+                msg: "Old password error!",
+            });
+        }
+    });
+};
