@@ -1,8 +1,10 @@
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const sequelize = require("../models");
-const Sequelize = require("sequelize");
 const {
-    Op
-} = require("sequelize");
+    secret
+} = require('../config');
+const jwt = require('jsonwebtoken');
 
 function randomNum(minNum, maxNum) {
     switch (arguments.length) {
@@ -19,59 +21,82 @@ function randomNum(minNum, maxNum) {
 }
 // login
 exports.login = async (req, res) => {
+    const {
+        username,
+        pwd,
+    } = req.body;
+
     const user = await sequelize.models.user.findOne({
-        where: req.body
+        where: {
+            username
+        },
+        raw: true
     });
     if (!user) {
         res.json({
             code: -1,
-            msg: "Account or password error",
+            msg: "A non-existent username!",
         });
         return;
     }
-    res.json({
-        code: 200,
-        msg: "Login successful!",
-        data: user
+    bcrypt.compare(pwd, user.pwd, async (err, result) => {
+        if (result == true) {
+            let token = jwt.sign(user, secret, {
+                expiresIn: '1d'
+            })
+            user.token = token;
+            res.json({
+                code: 200,
+                msg: "Login successful!",
+                data: user
+            });
+        } else {
+            res.json({
+                code: -1,
+                msg: "Password error!",
+            });
+        }
     });
+
+
 };
 // register
 exports.register = async (req, res) => {
-    try {
-        const {
+    const {
+        nickname,
+        username,
+        pwd
+    } = req.body;
+    const user = await sequelize.models.user.findOne({
+        where: {
             username
-        } = req.body;
-        const user = await sequelize.models.user.findOne({
-            where: {
-                username
-            }
-        });
-        if (user) {
-            res.json({
-                code: -1,
-                msg: "Existing account!",
-            });
-            return;
         }
-        let headpic = `/pic${randomNum(1, 10)}.png`;
+    });
+    if (user) {
+        res.json({
+            code: -1,
+            msg: "Existing account!",
+        });
+        return;
+    }
+    let headpic = `/pic${randomNum(1, 10)}.png`;
+    bcrypt.hash(pwd, saltRounds, async (err, hashPassword) => {
         const data = await sequelize.models.user.create({
             headpic,
-            ...req.body
+            nickname,
+            username,
+            pwd: hashPassword
         });
         res.json({
             code: 200,
             msg: "registered successfully",
             data
         });
-    } catch (error) {
-        console.log("error = ", error)
-    }
-
+    });
 };
 
 // update
 exports.update = async (req, res) => {
-
     await sequelize.models.user.update(req.body, {
         where: {
             id: req.params.id
