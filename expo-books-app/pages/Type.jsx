@@ -72,7 +72,9 @@ const Type = () => {
         url: "/type",
         method: "get",
       });
-      console.log("res123 = ", res);
+      res.data.forEach((item) => {
+        item.checked = true;
+      });
       dispatch(updateType(res.data));
     } catch (error) {
       Toast.show({

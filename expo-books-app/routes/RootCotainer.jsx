@@ -80,10 +80,10 @@ export default function RootCotainer() {
           }}
         />
         <Stack.Screen
-          name="Books Detail"
+          name="BooksDetail"
           component={BooksDetail}
           options={{
-            title: "BooksDetail",
+            title: "Book Detail",
             headerStyle: {
               backgroundColor: COLORS.primary,
             },

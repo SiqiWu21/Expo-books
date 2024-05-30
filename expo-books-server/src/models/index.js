@@ -28,6 +28,8 @@ fs.readdir(__dirname, (err, files) => {
         }
     });
     sequelize.sync().then(() => {
+
+        
         
     }).catch((err) => {
         console.log("err = ", err)

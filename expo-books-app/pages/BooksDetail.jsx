@@ -19,17 +19,42 @@ import {
 } from "react-native-paper";
 import COLORS from "../utils/Colors";
 import { useDispatch, useSelector } from "react-redux";
-import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import request, { baseURL } from "../utils/request";
+import Toast from "react-native-toast-message";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const BooksDetail = () => {
+  const [detail, setDetail] = useState(null);
   const [status, setStatus] = useState("Read");
   const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params;
   const [visible, setVisible] = useState(false);
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
+
+  useEffect(() => {
+    console.log("id = ", id);
+    getDetail();
+  }, []);
+
+  const getDetail = async () => {
+    try {
+      let res = await request({
+        url: `/book/${id}`,
+        method: "get",
+      });
+      console.log("detail = ", res.data);
+      setDetail(res.data);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Server Error!",
+      });
+    }
+  };
+
   return (
     <PaperProvider>
       <Portal>
@@ -47,7 +72,9 @@ const BooksDetail = () => {
                   height: 144,
                 }}
                 resizeMode="cover"
-                source={require("../assets/cover.jpg")}
+                source={{
+                  uri: baseURL + detail?.cover,
+                }}
               />
               <View
                 style={{
@@ -65,7 +92,7 @@ const BooksDetail = () => {
                       fontSize: fontSize,
                     }}
                   >
-                    To Kill a Mockingbird Mockingbird
+                    {detail?.bookName}
                   </Text>
                   <Text
                     style={{
@@ -73,50 +100,24 @@ const BooksDetail = () => {
                       marginTop: 5,
                     }}
                   >
-                    Harper Lee
+                    {detail?.author}
                   </Text>
                 </View>
 
-                <View
-                  style={{
-                    flexDirection: "row",
-                  }}
-                >
-                  <View
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      borderRadius: 15,
-                      backgroundColor: "#eee",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: fontSize * 0.8,
-                        color: "#666",
-                      }}
-                    >
-                      Unread
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      borderRadius: 15,
-                      backgroundColor: COLORS.primary,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: fontSize * 0.8,
-                        color: "#fff",
-                      }}
-                    >
-                      Read
-                    </Text>
-                  </View>
+                <View style={styles.bookStatus}>
+                  {detail?.status == "Unread" ? (
+                    <View style={styles.unreadBadge}>
+                      <Text style={{ fontSize: fontSize * 0.8, color: "#666" }}>
+                        Unread
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={styles.readBadge}>
+                      <Text style={{ fontSize: fontSize * 0.8, color: "#fff" }}>
+                        Read
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>
@@ -128,16 +129,20 @@ const BooksDetail = () => {
               }}
             ></View>
 
-            <View style={{
-              backgroundColor: '#fff',
-              padding: 20,
-            }}>
-              <Text style={{
-                fontSize,
-                color: '#666',
-                lineHeight: 1.5 * fontSize
-              }}>
-                dsjkdsjdssddsss
+            <View
+              style={{
+                backgroundColor: "#fff",
+                padding: 20,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize,
+                  color: "#666",
+                  lineHeight: 1.5 * fontSize,
+                }}
+              >
+                {detail?.desc}
               </Text>
             </View>
 
@@ -227,7 +232,20 @@ const BooksDetail = () => {
             </Dialog.Content>
             <Dialog.Actions>
               <Button
-                onPress={() => {
+                onPress={async () => {
+                  let res = await request({
+                    url: `/book/${id}`,
+                    method: "put",
+                    data: {
+                      status,
+                    },
+                  });
+                  Toast.show({
+                    type: "success",
+                    text1: "Success!",
+                    text2: res.msg,
+                  });
+                  getDetail();
                   setVisible(false);
                 }}
               >
@@ -245,16 +263,38 @@ const BooksDetail = () => {
             }}
           >
             <Button
+              mode="outlined"
+              icon="pen"
+              onPress={() => {
+                navigation.navigate("EditBook", {
+                  id,
+                });
+              }}
+            >
+              Edit
+            </Button>
+
+            <Button
+              icon="update"
               mode="contained-tonal"
               onPress={() => {
                 setVisible(true);
+                setStatus(detail.status);
               }}
             >
-              Mark Status
+              Mark
             </Button>
 
-            <Button mode="contained" onPress={() => console.log("Pressed")}>
-              Write A Review
+            <Button
+              icon="comment"
+              mode="contained"
+              onPress={() => {
+                navigation.navigate("AddReview", {
+                  id,
+                });
+              }}
+            >
+              Review
             </Button>
           </View>
         </View>
@@ -295,6 +335,21 @@ const styles = StyleSheet.create({
     elevation: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  bookStatus: {
+    flexDirection: "row",
+  },
+  unreadBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    backgroundColor: "#eee",
+  },
+  readBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
   },
 });
 

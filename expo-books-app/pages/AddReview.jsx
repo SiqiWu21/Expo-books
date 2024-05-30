@@ -8,9 +8,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect } from "react";
 import Toast from "react-native-toast-message";
 import COLORS from "../utils/Colors";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function AddReview() {
-  const [bookName, setBookName] = useState("");
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params;
   const [desc, setDesc] = useState("");
   const [cover, setCover] = useState("");
   const dispatch = useDispatch();
@@ -44,7 +47,7 @@ export default function AddReview() {
           <Button
             mode="contained-tonal"
             onPress={() => {
-            
+              navigation.goBack();
             }}
           >
             Cancel

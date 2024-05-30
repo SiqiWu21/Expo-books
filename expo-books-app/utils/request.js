@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 
-export const baseURL = "http://192.168.2.171:5000";
+export const baseURL = "http://192.168.1.3:5000";
 
 const request = axios.create({
     baseURL
