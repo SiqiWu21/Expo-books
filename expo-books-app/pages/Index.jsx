@@ -167,7 +167,6 @@ const Index = () => {
                     borderWidth: 1,
                     padding: 10,
                     justifyContent: "space-between",
-                    //   backgroundColor: COLORS.light,
                   }}
                 >
                   <View>
@@ -189,7 +188,47 @@ const Index = () => {
                     </Text>
                   </View>
 
-                  <ProgressBar progress={0.5} color={MD3Colors.error50} />
+                  <View
+                    style={{
+                      flexDirection: "row",
+                    }}
+                  >
+                    <View
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 15,
+                        backgroundColor: "#eee",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: fontSize * 0.8,
+                          color: "#666",
+                        }}
+                      >
+                        Unread
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 5,
+                        borderRadius: 15,
+                        backgroundColor: COLORS.primary,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: fontSize * 0.8,
+                          color: "#fff",
+                        }}
+                      >
+                        Read
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </TouchableOpacity>
             );

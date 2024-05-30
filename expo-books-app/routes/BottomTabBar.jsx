@@ -6,7 +6,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import COLORS from "../utils/Colors";
 import Index from "../pages/Index";
-import Review from "../pages/Review";
+import Find from "../pages/Find";
 import Type from "../pages/Type";
 import My from "../pages/My";
 
@@ -41,7 +41,7 @@ export default function BottomTabBar() {
       <Tab.Screen
         options={{
           title: "Type",
-          headerShown: false,
+          headerTitleAlign: "center",
           tabBarIcon: ({ color }) => (
             <AntDesign name="appstore1" size={20} color={color} />
           ),
@@ -52,14 +52,14 @@ export default function BottomTabBar() {
 
       <Tab.Screen
         options={{
-          title: "Review",
-          headerShown: false,
+          title: "Find",
+          headerTitleAlign: "center",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="rate-review" size={20} color={color} />
           ),
         }}
-        name="Review"
-        component={Review}
+        name="Find"
+        component={Find}
       />
 
       <Tab.Screen

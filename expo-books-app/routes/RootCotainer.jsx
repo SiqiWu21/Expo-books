@@ -6,6 +6,10 @@ import TabBar from "./BottomTabBar";
 import ChangePwd from "../pages/ChangePwd";
 import Userinfo from "../pages/Userinfo";
 import Settings from "../pages/Settings";
+import BooksDetail from "../pages/BooksDetail";
+import AddBook from "../pages/AddBook";
+import AddReview from "../pages/AddReview";
+import EditBook from "../pages/EditBook";
 
 export default function RootCotainer() {
   const Stack = createNativeStackNavigator();
@@ -14,15 +18,72 @@ export default function RootCotainer() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
+          name="AddReview"
+          component={AddReview}
+          options={{
+            title: "Add Review",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name="EditBook"
+          component={EditBook}
+          options={{
+            title: "Edit Book",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name="AddBook"
+          component={AddBook}
+          options={{
+            title: "Add Book",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
           name="TabBar"
           component={TabBar}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Books Detail"
+          component={BooksDetail}
+          options={{
+            title: "BooksDetail",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
         />
         <Stack.Screen
           name="Login"
           component={Login}
           options={{ headerShown: false }}
         />
+
         <Stack.Screen
           name="ChangePwd"
           component={ChangePwd}
