@@ -7,16 +7,61 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { ProgressBar, MD3Colors } from "react-native-paper";
 import COLORS from "../utils/Colors";
+import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
+import { updateUserinfo } from "../redux/reducers/userinfoSlice";
+import { updateType } from "../redux/reducers/typeSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
+import request from "../utils/request";
 
 const Index = () => {
+  const navigation = useNavigation();
+  const typeData = useSelector((state) => state.type.type);
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
+  const dispatch = useDispatch();
+  const userinfo = useSelector((state) => {
+    return state.userinfo.userinfo;
+  });
+  const getUserinfo = async () => {
+    const value = await AsyncStorage.getItem("userinfo");
+    if (value == null) {
+      navigation.navigate("Login");
+    } else {
+      dispatch(updateUserinfo(JSON.parse(value)));
+    }
+  };
+
+  const getTypeListData = async () => {
+    try {
+      let res = await request({
+        url: "/type",
+        method: "get",
+      });
+      res.data.checked = false;
+      dispatch(updateType(res.data));
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Server Error!",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if(userinfo && typeData.length === 0){
+      getTypeListData();
+    }
+  }, [userinfo])
+
+  useEffect(() => {
+    getUserinfo();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -39,7 +84,7 @@ const Index = () => {
               },
             ]}
           >
-            Hello, Mr zhang
+            Hello, {userinfo?.nickname}
           </Text>
           <Text
             style={{
@@ -113,14 +158,14 @@ const Index = () => {
               flexWrap: "wrap",
             }}
           >
-            {[1, 2, 3, 4, 5, 6, 7].map((item, index) => {
+            {typeData.map((item, index) => {
               return (
                 <TouchableOpacity
-                  key={item}
+                  key={item.id}
                   style={{
                     marginRight: 5,
                     marginBottom: 5,
-                    borderColor: "red",
+                    borderColor: item.color,
                     borderWidth: 1,
                     paddingHorizontal: 10,
                     paddingVertical: 5,
@@ -136,7 +181,7 @@ const Index = () => {
                       color: index % 2 == 0 ? "#fff" : "red",
                     }}
                   >
-                    Example Chip
+                    {item.title}
                   </Text>
                 </TouchableOpacity>
               );

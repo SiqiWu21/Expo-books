@@ -121,7 +121,6 @@ export default function Login() {
                     pwd,
                   },
                 });
-                console.log("res.data = ", res.data)
                 dispatch(updateUserinfo(res.data));
                 await AsyncStorage.setItem("userinfo", JSON.stringify(res.data));
                 navigation.navigate("TabBar");

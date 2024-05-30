@@ -10,6 +10,7 @@ import BooksDetail from "../pages/BooksDetail";
 import AddBook from "../pages/AddBook";
 import AddReview from "../pages/AddReview";
 import EditBook from "../pages/EditBook";
+import About from "../pages/About";
 
 export default function RootCotainer() {
   const Stack = createNativeStackNavigator();
@@ -17,6 +18,25 @@ export default function RootCotainer() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+        <Stack.Screen
+          name="TabBar"
+          component={TabBar}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="About"
+          component={About}
+          options={{
+            title: "About",
+            headerStyle: {
+              backgroundColor: COLORS.primary,
+            },
+            headerTitleStyle: {
+              color: "white",
+            },
+            headerTintColor: "white",
+          }}
+        />
         <Stack.Screen
           name="AddReview"
           component={AddReview}
@@ -58,11 +78,6 @@ export default function RootCotainer() {
             },
             headerTintColor: "white",
           }}
-        />
-        <Stack.Screen
-          name="TabBar"
-          component={TabBar}
-          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Books Detail"
