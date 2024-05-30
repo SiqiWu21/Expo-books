@@ -8,8 +8,6 @@ import { baseURL } from "../utils/request";
 import COLORS from "../utils/Colors";
 import { AntDesign } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 
@@ -17,6 +15,9 @@ export default function My() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const userinfo = useSelector((state) => state.userinfo.userinfo);
+  const fontSize = useSelector((state) => {
+    return state.fontSize.fontSize;
+  });
   console.log("userinfo = ", userinfo);
 
   return (
@@ -32,7 +33,9 @@ export default function My() {
               uri: userinfo ? baseURL + userinfo.headpic : "",
             }}
           />
-          <Text style={styles.headText}>{userinfo?.nickname}</Text>
+          <Text style={[styles.headText, { fontSize }]}>
+            {userinfo?.nickname}
+          </Text>
         </View>
       </LinearGradient>
 
@@ -41,7 +44,7 @@ export default function My() {
           <List.Section>
             <List.Item
               onPress={() => navigation.navigate("Userinfo")}
-              title="User Profile"
+              title={<Text style={[{ fontSize }]}>User Profile</Text>}
               left={() => (
                 <Entypo name="user" size={24} color={COLORS.primary} />
               )}
@@ -49,21 +52,21 @@ export default function My() {
             />
             <List.Item
               onPress={() => navigation.navigate("ChangePwd")}
-              title="Password Modification"
+              title={<Text style={[{ fontSize }]}>Password Modification</Text>}
               left={() => <Entypo name="lock" size={24} color="blue" />}
               right={() => <AntDesign name="right" size={20} color="#ddd" />}
             />
             <List.Item
-              onPress={() => navigation.navigate("Apply")}
-              title="Settings"
+              onPress={() => navigation.navigate("Settings")}
+              title={<Text style={[{ fontSize }]}>Settings</Text>}
               left={() => (
                 <Fontisto name="player-settings" size={24} color="deeppink" />
               )}
               right={() => <AntDesign name="right" size={20} color="#ddd" />}
             />
             <List.Item
-              onPress={() => navigation.navigate("Apply")}
-              title="About"
+              onPress={() => navigation.navigate("About")}
+              title={<Text style={[{ fontSize }]}>About</Text>}
               left={() => (
                 <AntDesign name="infocirlce" size={24} color="purple" />
               )}
@@ -84,7 +87,9 @@ export default function My() {
             navigation.replace("Login");
           }}
         >
-          Log out
+          <Text style={[{
+            fontSize
+          }]}> Log out</Text>
         </Button>
       </View>
     </View>
@@ -110,7 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headText: {
-    fontSize: 25,
     color: "white",
     fontWeight: "bold",
     marginLeft: 20,

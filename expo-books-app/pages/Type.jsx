@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-const Index = () => {
+const Type = () => {
     return (
         <View>
-            <Text>Index</Text>
+            <Text>Type</Text>
         </View>
     );
 }
 
-export default Index;
+export default Type;
