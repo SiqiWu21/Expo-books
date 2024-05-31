@@ -27,11 +27,7 @@ export default function AddReview() {
       let res = await request({
         url: `/review`,
         method: "get",
-        params: {
-          bookId: id,
-        },
       });
-      console.log("reviews = ", res.data);
       dispatch(updateReviewData(res.data));
     } catch (error) {
       Toast.show({

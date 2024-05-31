@@ -32,9 +32,7 @@ const Find = () => {
     return state.reviewData.reviewData;
   });
   console.log("reviewData = ", reviewData);
-  const [status, setStatus] = useState("Read");
   const navigation = useNavigation();
-  const [visible, setVisible] = useState(false);
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
@@ -55,6 +53,18 @@ const Find = () => {
       });
     }
   };
+  console.log("searchQuery = ", searchQuery);
+  let filterData = reviewData.filter((item) => {
+    let bol = false;
+    if (
+      item.review.indexOf(searchQuery) !== -1 ||
+      item?.book?.bookName.indexOf(searchQuery) !== -1
+    ) {
+      bol = true;
+    }
+    return bol;
+  });
+
   return (
     <View style={styles.container}>
       <View
@@ -71,7 +81,7 @@ const Find = () => {
         />
       </View>
       <ScrollView style={styles.scrollView}>
-        {reviewData.length === 0 && (
+        {filterData.length === 0 && (
           <View style={styles.emptyState}>
             <Image
               source={require("../assets/empty.png")}
@@ -80,13 +90,16 @@ const Find = () => {
             <Text style={[styles.emptyText, { fontSize }]}>no data</Text>
           </View>
         )}
-        {reviewData.map((item, index) => {
+        {filterData.map((item, index) => {
           return (
-            <TouchableOpacity onPress={() => {
-              navigation.navigate('BooksDetail', {
-                id: item.bookId
-              });
-            }} key={index}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("BooksDetail", {
+                  id: item.bookId,
+                });
+              }}
+              key={index}
+            >
               <View
                 style={{
                   backgroundColor: "#fff",
