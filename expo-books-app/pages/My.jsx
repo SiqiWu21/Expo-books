@@ -29,12 +29,14 @@ export default function My() {
         style={styles.headBox}
       >
         <View style={styles.headContent}>
-          <Avatar.Image
-            size={100}
-            source={{
-              uri: userinfo ? baseURL + userinfo.headpic : "",
-            }}
-          />
+          {userinfo && (
+            <Avatar.Image
+              size={100}
+              source={{
+                uri: userinfo ? baseURL + userinfo.headpic : "",
+              }}
+            />
+          )}
           <Text style={[styles.headText, { fontSize }]}>
             {userinfo?.nickname}
           </Text>
@@ -90,6 +92,7 @@ export default function My() {
             dispatch(updateReviewData([]));
             dispatch(updateType([]));
             await AsyncStorage.removeItem("userinfo");
+            await AsyncStorage.removeItem("fontSize");
             navigation.replace("Login");
           }}
         >

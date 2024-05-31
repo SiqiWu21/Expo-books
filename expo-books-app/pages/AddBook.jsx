@@ -33,6 +33,8 @@ export default function AddBook() {
   const [typeTitle, setTypeTitle] = useState("");
   const dispatch = useDispatch();
   const typeData = useSelector((state) => state.type.type);
+
+  // Function to pick an image from the device's library
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -41,6 +43,7 @@ export default function AddBook() {
       quality: 1,
       base64: false,
     });
+
     if (!result.canceled) {
       let uri = result.assets[0].uri;
       const formData = new FormData();
@@ -49,6 +52,7 @@ export default function AddBook() {
         type: "image/jpeg",
         name: "image.jpg",
       });
+
       const response = await fetch(baseURL + "/upload", {
         method: "POST",
         body: formData,
@@ -56,11 +60,13 @@ export default function AddBook() {
           "Content-Type": "multipart/form-data",
         },
       });
+
       const json = await response.json();
       setCover(json.data.imgUrl);
     }
   };
 
+  // Function to get the list of books and update the redux store
   const getBookData = async () => {
     try {
       let res = await request({
@@ -78,45 +84,28 @@ export default function AddBook() {
 
   return (
     <PaperProvider>
-      <ScrollView
-        style={{
-          flex: 1,
-          backgroundColor: "#fff",
-        }}
-      >
+      <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.card}>
-            <View style={{ alignItems: "center", marginTop: 20 }}>
+            <View style={styles.coverContainer}>
               {!cover ? (
-                <View
-                  style={{
-                    width: 125,
-                    height: 180,
-                    backgroundColor: COLORS.primary,
-                  }}
-                ></View>
+                <View style={styles.placeholder}></View>
               ) : (
-                <Image
-                  style={{ width: 125, height: 180 }}
-                  source={{ uri: baseURL + cover }}
-                />
+                <Image style={styles.coverImage} source={{ uri: baseURL + cover }} />
               )}
             </View>
-            <View style={{ alignItems: "center", marginVertical: 20 }}>
+            <View style={styles.uploadButtonContainer}>
               <Button icon="camera" mode="contained" onPress={pickImage}>
                 Upload book cover
               </Button>
             </View>
 
-            <TouchableOpacity onPress={() => {
-              setVisible(true);
-            }}>
+            <TouchableOpacity onPress={() => setVisible(true)}>
               <TextInput
                 style={styles.inputItem}
                 label="Book Type"
                 value={typeTitle}
                 editable={false}
-                onChangeText={(text) => setBookName(text)}
               />
             </TouchableOpacity>
 
@@ -158,7 +147,7 @@ export default function AddBook() {
                   Toast.show({
                     type: "error",
                     text1: "Error!",
-                    text2: "Please selec book type",
+                    text2: "Please select book type",
                   });
                   return;
                 }
@@ -186,6 +175,7 @@ export default function AddBook() {
                   });
                   return;
                 }
+
                 let res = await request({
                   url: `/book`,
                   method: "post",
@@ -210,39 +200,25 @@ export default function AddBook() {
             </Button>
           </View>
         </View>
-        <Dialog
-          visible={visible}
-          onDismiss={() => {
-            setVisible(false);
-          }}
-        >
+
+        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
           <Dialog.Title>Select Book Type</Dialog.Title>
           <Dialog.Content>
-            <ScrollView style={{
-              height: 300
-            }}>
+            <ScrollView style={styles.dialogContent}>
               <RadioButton.Group
                 onValueChange={(value) => setTypeId(value)}
                 value={typeId}
               >
-                {typeData.map((item, index) => {
-                  return (
-                    <RadioButton.Item
-                      key={index}
-                      label={item.title}
-                      value={item.id}
-                    />
-                  );
-                })}
+                {typeData.map((item, index) => (
+                  <RadioButton.Item key={index} label={item.title} value={item.id} />
+                ))}
               </RadioButton.Group>
             </ScrollView>
           </Dialog.Content>
           <Dialog.Actions>
             <Button
               onPress={() => {
-                let item = typeData.find((item) => {
-                  return item.id == typeId;
-                })
+                let item = typeData.find((item) => item.id == typeId);
                 setTypeTitle(item.title);
                 setVisible(false);
               }}
@@ -256,33 +232,41 @@ export default function AddBook() {
   );
 }
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     alignItems: "center",
+  },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
   card: {
     width: "80%",
   },
+  coverContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  placeholder: {
+    width: 125,
+    height: 180,
+    backgroundColor: COLORS.primary,
+  },
+  coverImage: {
+    width: 125,
+    height: 180,
+  },
+  uploadButtonContainer: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
   inputItem: {
     marginBottom: 20,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-  },
-  modalItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  dialogContent: {
+    height: 300,
   },
 });
+

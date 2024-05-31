@@ -11,6 +11,7 @@ import COLORS from "../utils/Colors";
 import Toast from "react-native-toast-message";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserinfo } from "../redux/reducers/userinfoSlice";
+import { updateFontSize } from "../redux/reducers/fontSizeSlice";
 import { updateType } from "../redux/reducers/typeSlice";
 import { updateBookData } from "../redux/reducers/bookDataSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,6 +36,13 @@ const Index = () => {
     if (value == null) {
       navigation.navigate("Login");
     } else {
+      let res = await request({
+        url: `/settings`,
+        method: "get",
+      });
+      if(res.data.length){
+        dispatch(updateFontSize(Number(res.data[0].fontSize)));
+      }
       dispatch(updateUserinfo(JSON.parse(value)));
     }
   };

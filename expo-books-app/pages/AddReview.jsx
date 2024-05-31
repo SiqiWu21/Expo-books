@@ -1,27 +1,20 @@
-import { StyleSheet, View, Platform, Image } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { updateUserinfo } from "../redux/reducers/userinfoSlice";
-import * as ImagePicker from "expo-image-picker";
-import request, { baseURL } from "../utils/request";
-import { Button, TextInput, Avatar } from "react-native-paper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState, useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+import { useDispatch } from "react-redux";
+import request from "../utils/request";
+import { Button, TextInput } from "react-native-paper";
+import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { updateReviewData } from "../redux/reducers/reviewDataSlice";
-import COLORS from "../utils/Colors";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 export default function AddReview() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { id } = route.params;
-  const [review, setReview] = useState("");
-  const [cover, setCover] = useState("");
+  const { id } = route.params; // Get the book ID from the route parameters
+  const [review, setReview] = useState(""); // State for the review input
   const dispatch = useDispatch();
-  const userinfo = useSelector((state) => {
-    return state.userinfo.userinfo;
-  });
 
+  // Function to fetch the list of reviews
   const getReviewList = async () => {
     try {
       let res = await request({
@@ -49,15 +42,7 @@ export default function AddReview() {
           onChangeText={(text) => setReview(text)}
         />
 
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-around",
-            borderTopColor: "#ddd",
-            borderTopWidth: 1,
-            paddingVertical: 20,
-          }}
-        >
+        <View style={styles.buttonContainer}>
           <Button
             mode="contained-tonal"
             onPress={() => {
@@ -83,7 +68,7 @@ export default function AddReview() {
                 method: "post",
                 data: {
                   bookId: id,
-                  review
+                  review,
                 },
               });
               getReviewList();
@@ -103,6 +88,7 @@ export default function AddReview() {
   );
 }
 
+// Styles extracted to the styles object
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -115,5 +101,12 @@ const styles = StyleSheet.create({
   },
   inputItem: {
     flex: 1,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderTopColor: "#ddd",
+    borderTopWidth: 1,
+    paddingVertical: 20,
   },
 });

@@ -13,7 +13,6 @@ const fontSizeSlice = createSlice({
         updateFontSize(state, {
             payload
         }) {
-            console.log("payload = ", payload)
             state.fontSize = payload;
         }
     },

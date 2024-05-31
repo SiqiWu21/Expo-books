@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
+import { StyleSheet, View, ScrollView, Image } from "react-native";
 import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from "react-native";
-import {
-  ProgressBar,
-  MD3Colors,
   Button,
-  Chip,
   Dialog,
   Portal,
   PaperProvider,
@@ -26,39 +17,58 @@ import moment from "moment";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 const BooksDetail = () => {
+  // Redux dispatch function to update the state
   const dispatch = useDispatch();
+  // Local state for book details
   const [detail, setDetail] = useState(null);
+  // Local state for book status
   const [status, setStatus] = useState("Read");
+  // Navigation and route hooks
   const navigation = useNavigation();
   const route = useRoute();
+  // Getting user info from Redux store
   const userinfo = useSelector((state) => {
     return state.userinfo.userinfo;
   });
+  // Getting book data from Redux store
+  const bookData = useSelector((state) => {
+    return state.bookData.bookData;
+  });
+  // Getting book ID from route parameters
   const { id } = route.params;
+  // Local state for dialog visibility
   const [visible, setVisible] = useState(false);
+  // Getting font size from Redux store
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
+  // Getting review data from Redux store
   const reviewData = useSelector((state) => {
     return state.reviewData.reviewData;
   });
 
+  // Filtering reviews for the current book
   let currentBookReviewData = reviewData.filter((item) => {
     return item.bookId == id;
   });
 
+  // Fetch reviews on component mount
   useEffect(() => {
-    getDetail();
     getReviewList();
   }, []);
 
+  // Fetch book details when book data changes
+  useEffect(() => {
+    getDetail();
+  }, [bookData]);
+
+  // Function to fetch book details from the server
   const getDetail = async () => {
     try {
       let res = await request({
         url: `/book/${id}`,
         method: "get",
       });
-      console.log("detail = ", res.data);
       setDetail(res.data);
     } catch (error) {
       Toast.show({
@@ -68,13 +78,13 @@ const BooksDetail = () => {
     }
   };
 
+  // Function to fetch reviews from the server
   const getReviewList = async () => {
     try {
       let res = await request({
         url: `/review`,
         method: "get",
       });
-      console.log("reviews = ", res.data);
       dispatch(updateReviewData(res.data));
     } catch (error) {
       Toast.show({
@@ -83,6 +93,8 @@ const BooksDetail = () => {
       });
     }
   };
+
+  // Checking if the logged-in user is the owner of the book
   let isMe = (userinfo && userinfo?.id) == (detail && detail?.userId);
 
   return (

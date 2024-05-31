@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer')
 const path = require('path');
+const fs = require('fs');
 const app = express();
 const {
     expressjwt: expressJWT
@@ -32,7 +33,7 @@ app.use(expressJWT({
     secret,
     algorithms: ["HS256"]
 }).unless({
-    path: ['/user/login', '/user/register', '/upload'],
+    path: ['/user/login', '/user/register', '/upload', '/licenses'],
     ext: ['png', 'jpg', 'webp'],
 }));
 
@@ -51,6 +52,20 @@ app.use((err, req, res, next) => {
     }
     next();
 })
+
+const licensesFilePath = path.join(__dirname, 'licenses.json');
+let licensesData = [];
+
+if (fs.existsSync(licensesFilePath)) {
+    licensesData = JSON.parse(fs.readFileSync(licensesFilePath, 'utf-8'));
+} else {
+    console.error('Licenses file not found. Please run `npm-license-crawler` first.');
+}
+
+
+app.get('/licenses', (req, res) => {
+    res.json(licensesData);
+});
 
 app.post('/upload', upload.single('file'), function (req, res, next) {
     res.json({

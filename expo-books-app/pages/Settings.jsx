@@ -8,12 +8,13 @@ import { Button, TextInput, RadioButton, Text } from "react-native-paper";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import COLORS from "../utils/Colors";
+
 export default function Settings() {
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
   const navigation = useNavigation();
-  const [size, setSize] = useState(14);
+  const [size, setSize] = useState(fontSize);
   const dispatch = useDispatch();
   return (
     <View style={styles.container}>
@@ -37,8 +38,15 @@ export default function Settings() {
           mode="contained"
           style={styles.btn}
           onPress={async () => {
+            await request({
+              url: `/settings`,
+              method: "post",
+              data: {
+                fontSize: size
+              },
+            });
             dispatch(updateFontSize(size));
-            await AsyncStorage.setItem("fontSize", 20 + '');
+            await AsyncStorage.setItem("fontSize", 20 + "");
             Toast.show({
               type: "success",
               text1: "Success!",

@@ -13,7 +13,6 @@ const userinfoSlice = createSlice({
         updateUserinfo(state, {
             payload
         }) {
-            // console.log("payload = ", payload)
             state.userinfo = payload;
         }
     },

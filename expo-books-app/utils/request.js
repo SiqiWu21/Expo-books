@@ -1,8 +1,11 @@
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import Constants from "expo-constants";
 
-export const baseURL = "http://192.168.1.3:5000";
+const { manifest } = Constants;
+
+export const baseURL = `http://${manifest.debuggerHost.split(':').shift()}:5000`;
 
 const request = axios.create({
     baseURL

@@ -7,15 +7,7 @@ import {
   Image,
 } from "react-native";
 import {
-  ProgressBar,
-  MD3Colors,
-  Button,
-  Chip,
-  Dialog,
-  Portal,
-  PaperProvider,
   Text,
-  RadioButton,
   Searchbar,
 } from "react-native-paper";
 import moment from "moment";
@@ -31,7 +23,6 @@ const Find = () => {
   const reviewData = useSelector((state) => {
     return state.reviewData.reviewData;
   });
-  console.log("reviewData = ", reviewData);
   const navigation = useNavigation();
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
@@ -53,7 +44,6 @@ const Find = () => {
       });
     }
   };
-  console.log("searchQuery = ", searchQuery);
   let filterData = reviewData.filter((item) => {
     let bol = false;
     if (
@@ -64,7 +54,6 @@ const Find = () => {
     }
     return bol;
   });
-
   return (
     <View style={styles.container}>
       <View

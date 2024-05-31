@@ -1,19 +1,33 @@
 const sequelize = require("../models");
-const {
-    Op
-} = require('sequelize');
 
 exports.create = async (req, res) => {
     const userId = req.auth.id;
-    const data = await sequelize.models.settings.create({
-        ...req.body,
-        userId,
-    });
-    res.json({
-        code: 200,
-        msg: "New successfully added!",
-        data
-    });
+    let item = await sequelize.models.settings.findOne({
+        where: {
+            userId
+        }
+    })
+    if (!item) {
+        const data = await sequelize.models.settings.create({
+            ...req.body,
+            userId,
+        });
+        res.json({
+            code: 200,
+            msg: "Update successful!",
+            data
+        });
+    } else {
+        await sequelize.models.settings.update(req.body, {
+            where: {
+                userId
+            }
+        });
+        res.json({
+            code: 200,
+            msg: "Update successful!",
+        });
+    }
 };
 // update
 exports.update = async (req, res) => {
