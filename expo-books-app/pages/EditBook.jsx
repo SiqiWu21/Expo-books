@@ -270,6 +270,14 @@ export default function EditBook() {
           <Dialog.Actions>
             <Button
               onPress={() => {
+                if(!typeId){
+                  Toast.show({
+                    type: "error",
+                    text1: "Error!",
+                    text2: "Please select book type",
+                  });
+                  return;
+                }
                 let item = typeData.find((item) => {
                   return item.id == typeId;
                 });
