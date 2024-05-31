@@ -6,10 +6,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import {
-  Text,
-  Searchbar,
-} from "react-native-paper";
+import { Text, Searchbar, IconButton } from "react-native-paper";
 import moment from "moment";
 import { updateReviewData } from "../redux/reducers/reviewDataSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,6 +23,10 @@ const Find = () => {
   const navigation = useNavigation();
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
+  });
+  // Getting user info from Redux store
+  const userinfo = useSelector((state) => {
+    return state.userinfo.userinfo;
   });
   useEffect(() => {
     getReviewList();
@@ -149,6 +150,32 @@ const Find = () => {
                 >
                   {item.review}
                 </Text>
+                {userinfo?.id == item.userId && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <IconButton
+                      icon="delete"
+                      iconColor="red"
+                      size={20}
+                      onPress={async () => {
+                        let res = await request({
+                          url: `/review/${item.id}`,
+                          method: "delete",
+                        });
+                        getReviewList();
+                        Toast.show({
+                          type: "success",
+                          text1: "Success!",
+                          text2: res.msg,
+                        });
+                      }}
+                    />
+                  </View>
+                )}
               </View>
               <View
                 style={{

@@ -7,6 +7,7 @@ import {
   PaperProvider,
   Text,
   RadioButton,
+  IconButton,
 } from "react-native-paper";
 import COLORS from "../utils/Colors";
 import { useDispatch, useSelector } from "react-redux";
@@ -201,6 +202,32 @@ const BooksDetail = () => {
                   >
                     {item.review}
                   </Text>
+                  {userinfo?.id == item.userId && (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <IconButton
+                        icon="delete"
+                        iconColor="red"
+                        size={20}
+                        onPress={async () => {
+                          let res = await request({
+                            url: `/review/${item.id}`,
+                            method: "delete",
+                          });
+                          getReviewList();
+                          Toast.show({
+                            type: "success",
+                            text1: "Success!",
+                            text2: res.msg,
+                          });
+                        }}
+                      />
+                    </View>
+                  )}
                 </View>
               );
             })}
