@@ -19,24 +19,33 @@ import {
 } from "react-native-paper";
 import COLORS from "../utils/Colors";
 import { useDispatch, useSelector } from "react-redux";
+import { updateReviewData } from "../redux/reducers/reviewDataSlice";
 import request, { baseURL } from "../utils/request";
 import Toast from "react-native-toast-message";
+import moment from "moment";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 const BooksDetail = () => {
+  const dispatch = useDispatch();
   const [detail, setDetail] = useState(null);
   const [status, setStatus] = useState("Read");
   const navigation = useNavigation();
   const route = useRoute();
+  const userinfo = useSelector((state) => {
+    return state.userinfo.userinfo;
+  });
   const { id } = route.params;
   const [visible, setVisible] = useState(false);
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
+  const reviewData = useSelector((state) => {
+    return state.reviewData.reviewData;
+  });
 
   useEffect(() => {
-    console.log("id = ", id);
     getDetail();
+    getReviewList();
   }, []);
 
   const getDetail = async () => {
@@ -47,6 +56,25 @@ const BooksDetail = () => {
       });
       console.log("detail = ", res.data);
       setDetail(res.data);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Server Error!",
+      });
+    }
+  };
+
+  const getReviewList = async () => {
+    try {
+      let res = await request({
+        url: `/review`,
+        method: "get",
+        params: {
+          bookId: id,
+        },
+      });
+      console.log("reviews = ", res.data);
+      dispatch(updateReviewData(res.data));
     } catch (error) {
       Toast.show({
         type: "error",
@@ -162,57 +190,71 @@ const BooksDetail = () => {
             >
               Review
             </Text>
-
-            <View
-              style={{
-                backgroundColor: "#eee",
-                padding: 20,
-                marginHorizontal: 20,
-                borderRadius: 5,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+            {reviewData.length == 0 && (
+              <View style={styles.emptyState}>
                 <Image
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 30,
-                  }}
-                  resizeMode="cover"
-                  source={require("../assets/cover.jpg")}
+                  source={require("../assets/empty.png")}
+                  style={styles.emptyImage}
                 />
-                <Text
-                  style={{
-                    fontSize: fontSize,
-                    color: "#666",
-                    marginHorizontal: 10,
-                  }}
-                >
-                  tom
-                </Text>
-                <Text
-                  style={{
-                    fontSize: fontSize,
-                    color: "#999",
-                  }}
-                >
-                  3 days ago
-                </Text>
+                <Text style={[styles.emptyText, { fontSize }]}>no data</Text>
               </View>
-              <Text
-                style={{
-                  fontSize,
-                  lineHeight: 2 * fontSize,
-                }}
-              >
-                ahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjs4466
-              </Text>
-            </View>
+            )}
+            {reviewData.map((item) => {
+              return (
+                <View
+                  key={item.id}
+                  style={{
+                    backgroundColor: "#eee",
+                    padding: 20,
+                    marginHorizontal: 20,
+                    borderRadius: 5,
+                    marginBottom: 20,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 30,
+                      }}
+                      resizeMode="cover"
+                      source={{ uri: baseURL + item.user?.headpic }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: fontSize,
+                        color: "#666",
+                        marginHorizontal: 10,
+                      }}
+                    >
+                      {item.user?.nickname}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: fontSize,
+                        color: "#999",
+                      }}
+                    >
+                      {moment(item.created_at).fromNow()}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize,
+                      lineHeight: 2 * fontSize,
+                    }}
+                  >
+                    {item.review}
+                  </Text>
+                </View>
+              );
+            })}
           </ScrollView>
           <Dialog
             visible={visible}
@@ -253,50 +295,52 @@ const BooksDetail = () => {
               </Button>
             </Dialog.Actions>
           </Dialog>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              borderTopColor: "#ddd",
-              borderTopWidth: 1,
-              paddingVertical: 20,
-            }}
-          >
-            <Button
-              mode="outlined"
-              icon="pen"
-              onPress={() => {
-                navigation.navigate("EditBook", {
-                  id,
-                });
+          {((userinfo && userinfo?.id) != (detail && detail?.userId)) && (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                borderTopColor: "#ddd",
+                borderTopWidth: 1,
+                paddingVertical: 20,
               }}
             >
-              Edit
-            </Button>
+              <Button
+                mode="outlined"
+                icon="pen"
+                onPress={() => {
+                  navigation.navigate("EditBook", {
+                    id,
+                  });
+                }}
+              >
+                Edit
+              </Button>
 
-            <Button
-              icon="update"
-              mode="contained-tonal"
-              onPress={() => {
-                setVisible(true);
-                setStatus(detail.status);
-              }}
-            >
-              Mark
-            </Button>
+              <Button
+                icon="update"
+                mode="contained-tonal"
+                onPress={() => {
+                  setVisible(true);
+                  setStatus(detail.status);
+                }}
+              >
+                Mark
+              </Button>
 
-            <Button
-              icon="comment"
-              mode="contained"
-              onPress={() => {
-                navigation.navigate("AddReview", {
-                  id,
-                });
-              }}
-            >
-              Review
-            </Button>
-          </View>
+              <Button
+                icon="comment"
+                mode="contained"
+                onPress={() => {
+                  navigation.navigate("AddReview", {
+                    id,
+                  });
+                }}
+              >
+                Review
+              </Button>
+            </View>
+          )}
         </View>
       </Portal>
     </PaperProvider>
@@ -350,6 +394,21 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 15,
     backgroundColor: COLORS.primary,
+  },
+  emptyState: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  emptyImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  emptyText: {
+    color: "#999",
+    textAlign: "center",
   },
 });
 

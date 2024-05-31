@@ -7,6 +7,7 @@ import { Button, TextInput, Avatar } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect } from "react";
 import Toast from "react-native-toast-message";
+import { updateReviewData } from "../redux/reducers/reviewDataSlice";
 import COLORS from "../utils/Colors";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -14,14 +15,31 @@ export default function AddReview() {
   const navigation = useNavigation();
   const route = useRoute();
   const { id } = route.params;
-  const [desc, setDesc] = useState("");
+  const [review, setReview] = useState("");
   const [cover, setCover] = useState("");
   const dispatch = useDispatch();
   const userinfo = useSelector((state) => {
     return state.userinfo.userinfo;
   });
 
-  useEffect(() => {}, []);
+  const getReviewList = async () => {
+    try {
+      let res = await request({
+        url: `/review`,
+        method: "get",
+        params: {
+          bookId: id,
+        },
+      });
+      console.log("reviews = ", res.data);
+      dispatch(updateReviewData(res.data));
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Server Error!",
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -30,9 +48,9 @@ export default function AddReview() {
           style={styles.inputItem}
           multiline={true}
           mode="flat"
-          value={desc}
+          value={review}
           placeholder="Write some current inspirations~"
-          onChangeText={(text) => setDesc(text)}
+          onChangeText={(text) => setReview(text)}
         />
 
         <View
@@ -53,7 +71,34 @@ export default function AddReview() {
             Cancel
           </Button>
 
-          <Button mode="contained" onPress={() => console.log("Pressed")}>
+          <Button
+            mode="contained"
+            onPress={async () => {
+              if (!review) {
+                Toast.show({
+                  type: "error",
+                  text1: "Error!",
+                  text2: "Please enter some current inspirations~",
+                });
+                return;
+              }
+              let res = await request({
+                url: `/review`,
+                method: "post",
+                data: {
+                  bookId: id,
+                  review
+                },
+              });
+              getReviewList();
+              navigation.goBack();
+              Toast.show({
+                type: "success",
+                text1: "Success!",
+                text2: res.msg,
+              });
+            }}
+          >
             Submit
           </Button>
         </View>

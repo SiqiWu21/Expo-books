@@ -3,12 +3,12 @@ const fs = require('fs');
 const sequelize = new Sequelize('expo_books', 'root', '123456', {
     host: 'localhost',
     dialect: 'mysql',
-    timezone: '+8:00', 
-    define: { 
+    timezone: '+8:00',
+    define: {
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     },
-    dialectOptions: { 
+    dialectOptions: {
         dateStrings: true,
         typeCast(field, next) {
             if (field.type === "DATETIME") {
@@ -28,9 +28,22 @@ fs.readdir(__dirname, (err, files) => {
         }
     });
     sequelize.sync().then(() => {
+        sequelize.models.book.belongsTo(sequelize.models.type, {
+            foreignKey: 'typeId',
+            sourceKey: 'id'
+        });
 
-        
-        
+        sequelize.models.review.belongsTo(sequelize.models.user, {
+            foreignKey: 'userId',
+            sourceKey: 'id'
+        });
+
+        sequelize.models.review.belongsTo(sequelize.models.book, {
+            foreignKey: 'bookId',
+            sourceKey: 'id'
+        });
+
+
     }).catch((err) => {
         console.log("err = ", err)
     });
