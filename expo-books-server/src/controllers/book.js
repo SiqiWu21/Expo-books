@@ -76,6 +76,7 @@ exports.detail = async (req, res, next) => {
         where: {
             id: req.params.id
         },
+        include: [sequelize.models.type]
     });
     res.json({
         code: 200,

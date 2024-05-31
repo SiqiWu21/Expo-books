@@ -43,6 +43,10 @@ const BooksDetail = () => {
     return state.reviewData.reviewData;
   });
 
+  let currentBookReviewData = reviewData.filter((item) => {
+    return item.bookId == id;
+  });
+
   useEffect(() => {
     getDetail();
     getReviewList();
@@ -69,9 +73,6 @@ const BooksDetail = () => {
       let res = await request({
         url: `/review`,
         method: "get",
-        params: {
-          bookId: id,
-        },
       });
       console.log("reviews = ", res.data);
       dispatch(updateReviewData(res.data));
@@ -82,173 +83,109 @@ const BooksDetail = () => {
       });
     }
   };
+  let isMe = (userinfo && userinfo?.id) == (detail && detail?.userId);
 
   return (
     <PaperProvider>
       <Portal>
         <View style={styles.container}>
           <ScrollView style={styles.scrollView}>
-            <View
-              style={{
-                flexDirection: "row",
-                padding: 20,
-              }}
-            >
+            <View style={styles.bookHeader}>
               <Image
-                style={{
-                  width: 100,
-                  height: 144,
-                }}
+                style={styles.bookCover}
                 resizeMode="cover"
                 source={{
                   uri: baseURL + detail?.cover,
                 }}
               />
-              <View
-                style={{
-                  flex: 1,
-                  borderColor: "#eee",
-                  borderWidth: 1,
-                  padding: 10,
-                  justifyContent: "space-between",
-                }}
-              >
+              <View style={styles.bookInfo}>
                 <View>
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      fontSize: fontSize,
-                    }}
-                  >
+                  <Text style={[styles.bookName, { fontSize: fontSize }]}>
                     {detail?.bookName}
                   </Text>
-                  <Text
-                    style={{
-                      color: "#666",
-                      marginTop: 5,
-                    }}
-                  >
-                    {detail?.author}
-                  </Text>
+                  <Text style={styles.author}>{detail?.author}</Text>
                 </View>
-
-                <View style={styles.bookStatus}>
-                  {detail?.status == "Unread" ? (
-                    <View style={styles.unreadBadge}>
-                      <Text style={{ fontSize: fontSize * 0.8, color: "#666" }}>
-                        Unread
-                      </Text>
-                    </View>
-                  ) : (
+                {!isMe && (
+                  <View style={styles.bookStatus}>
                     <View style={styles.readBadge}>
                       <Text style={{ fontSize: fontSize * 0.8, color: "#fff" }}>
-                        Read
+                        {detail?.type?.title}
                       </Text>
                     </View>
-                  )}
-                </View>
+                  </View>
+                )}
+                {isMe && (
+                  <View style={styles.bookStatus}>
+                    {detail?.status == "Unread" ? (
+                      <View style={styles.unreadBadge}>
+                        <Text
+                          style={{ fontSize: fontSize * 0.8, color: "#666" }}
+                        >
+                          Unread
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.readBadge}>
+                        <Text
+                          style={{ fontSize: fontSize * 0.8, color: "#fff" }}
+                        >
+                          Read
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
             </View>
 
-            <View
-              style={{
-                height: 6,
-                backgroundColor: "#eee",
-              }}
-            ></View>
+            <View style={styles.separator}></View>
 
-            <View
-              style={{
-                backgroundColor: "#fff",
-                padding: 20,
-              }}
-            >
+            <View style={styles.descriptionContainer}>
               <Text
-                style={{
-                  fontSize,
-                  color: "#666",
-                  lineHeight: 1.5 * fontSize,
-                }}
+                style={[
+                  styles.description,
+                  { fontSize, lineHeight: 1.5 * fontSize },
+                ]}
               >
                 {detail?.desc}
               </Text>
             </View>
 
-            <View
-              style={{
-                height: 6,
-                backgroundColor: "#eee",
-              }}
-            ></View>
+            <View style={styles.separator}></View>
 
-            <Text
-              style={{
-                fontSize: fontSize * 1.2,
-                fontWeight: "bold",
-                padding: 20,
-              }}
-            >
+            <Text style={[styles.reviewTitle, { fontSize: fontSize * 1.2 }]}>
               Review
             </Text>
-            {reviewData.length == 0 && (
+            {currentBookReviewData.length == 0 && (
               <View style={styles.emptyState}>
                 <Image
                   source={require("../assets/empty.png")}
                   style={styles.emptyImage}
                 />
-                <Text style={[styles.emptyText, { fontSize }]}>no data</Text>
+                <Text style={[styles.emptyText, { fontSize }]}>No data</Text>
               </View>
             )}
-            {reviewData.map((item) => {
+            {currentBookReviewData.map((item) => {
               return (
-                <View
-                  key={item.id}
-                  style={{
-                    backgroundColor: "#eee",
-                    padding: 20,
-                    marginHorizontal: 20,
-                    borderRadius: 5,
-                    marginBottom: 20,
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
+                <View key={item.id} style={styles.reviewContainer}>
+                  <View style={styles.reviewHeader}>
                     <Image
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 30,
-                      }}
+                      style={styles.reviewAvatar}
                       resizeMode="cover"
                       source={{ uri: baseURL + item.user?.headpic }}
                     />
-                    <Text
-                      style={{
-                        fontSize: fontSize,
-                        color: "#666",
-                        marginHorizontal: 10,
-                      }}
-                    >
+                    <Text style={[styles.reviewUser, { fontSize: fontSize }]}>
                       {item.user?.nickname}
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: fontSize,
-                        color: "#999",
-                      }}
-                    >
+                    <Text style={[styles.reviewDate, { fontSize: fontSize }]}>
                       {moment(item.created_at).fromNow()}
                     </Text>
                   </View>
                   <Text
-                    style={{
-                      fontSize,
-                      lineHeight: 2 * fontSize,
-                    }}
+                    style={[
+                      styles.reviewText,
+                      { fontSize, lineHeight: 2 * fontSize },
+                    ]}
                   >
                     {item.review}
                   </Text>
@@ -295,16 +232,8 @@ const BooksDetail = () => {
               </Button>
             </Dialog.Actions>
           </Dialog>
-          {((userinfo && userinfo?.id) != (detail && detail?.userId)) && (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-around",
-                borderTopColor: "#ddd",
-                borderTopWidth: 1,
-                paddingVertical: 20,
-              }}
-            >
+          {isMe && (
+            <View style={styles.actionButtons}>
               <Button
                 mode="outlined"
                 icon="pen"
@@ -355,30 +284,27 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  headBox: {
-    height: 250,
-    position: "relative",
-    justifyContent: "center",
-    paddingHorizontal: 20,
+  bookHeader: {
+    flexDirection: "row",
+    padding: 20,
   },
-  floatingButton: {
-    backgroundColor: "#9317ed",
-    width: 50,
-    height: 50,
-    position: "absolute",
-    right: 10,
-    bottom: 30,
-    borderRadius: 50,
-    zIndex: 100,
-    // iOS shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    // Android shadow
-    elevation: 10,
-    justifyContent: "center",
-    alignItems: "center",
+  bookCover: {
+    width: 100,
+    height: 144,
+  },
+  bookInfo: {
+    flex: 1,
+    borderColor: "#eee",
+    borderWidth: 1,
+    padding: 10,
+    justifyContent: "space-between",
+  },
+  bookName: {
+    fontWeight: "bold",
+  },
+  author: {
+    color: "#666",
+    marginTop: 5,
   },
   bookStatus: {
     flexDirection: "row",
@@ -395,6 +321,21 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: COLORS.primary,
   },
+  separator: {
+    height: 6,
+    backgroundColor: "#eee",
+  },
+  descriptionContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+  },
+  description: {
+    color: "#666",
+  },
+  reviewTitle: {
+    fontWeight: "bold",
+    padding: 20,
+  },
   emptyState: {
     justifyContent: "center",
     alignItems: "center",
@@ -409,6 +350,39 @@ const styles = StyleSheet.create({
   emptyText: {
     color: "#999",
     textAlign: "center",
+  },
+  reviewContainer: {
+    backgroundColor: "#eee",
+    padding: 20,
+    marginHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  reviewAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 30,
+  },
+  reviewUser: {
+    color: "#666",
+    marginHorizontal: 10,
+  },
+  reviewDate: {
+    color: "#999",
+  },
+  reviewText: {
+    lineHeight: 2,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderTopColor: "#ddd",
+    borderTopWidth: 1,
+    paddingVertical: 20,
   },
 });
 

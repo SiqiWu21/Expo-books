@@ -58,7 +58,8 @@ exports.index = async (req, res) => {
         where: {
             ...where
         },
-        include: [sequelize.models.user, sequelize.models.book]
+        include: [sequelize.models.user, sequelize.models.book],
+        order: [['created_at', 'DESC']]
     });
     res.json({
         code: 200,

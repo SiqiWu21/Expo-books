@@ -18,20 +18,43 @@ import {
   RadioButton,
   Searchbar,
 } from "react-native-paper";
-import COLORS from "../utils/Colors";
+import moment from "moment";
+import { updateReviewData } from "../redux/reducers/reviewDataSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign } from "@expo/vector-icons";
+import request, { baseURL } from "../utils/request";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const Find = () => {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
+  const reviewData = useSelector((state) => {
+    return state.reviewData.reviewData;
+  });
+  console.log("reviewData = ", reviewData);
   const [status, setStatus] = useState("Read");
   const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
+  useEffect(() => {
+    getReviewList();
+  }, []);
+  const getReviewList = async () => {
+    try {
+      let res = await request({
+        url: `/review`,
+        method: "get",
+      });
+      dispatch(updateReviewData(res.data));
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Server Error!",
+      });
+    }
+  };
   return (
     <View style={styles.container}>
       <View
@@ -48,9 +71,22 @@ const Find = () => {
         />
       </View>
       <ScrollView style={styles.scrollView}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 1, 5].map((item, index) => {
+        {reviewData.length === 0 && (
+          <View style={styles.emptyState}>
+            <Image
+              source={require("../assets/empty.png")}
+              style={styles.emptyImage}
+            />
+            <Text style={[styles.emptyText, { fontSize }]}>no data</Text>
+          </View>
+        )}
+        {reviewData.map((item, index) => {
           return (
-            <TouchableOpacity key={index}>
+            <TouchableOpacity onPress={() => {
+              navigation.navigate('BooksDetail', {
+                id: item.bookId
+              });
+            }} key={index}>
               <View
                 style={{
                   backgroundColor: "#fff",
@@ -73,7 +109,7 @@ const Find = () => {
                       borderRadius: 30,
                     }}
                     resizeMode="cover"
-                    source={require("../assets/cover.jpg")}
+                    source={{ uri: baseURL + item.user?.headpic }}
                   />
                   <Text
                     style={{
@@ -82,7 +118,7 @@ const Find = () => {
                       marginHorizontal: 10,
                     }}
                   >
-                    tom
+                    {item.user?.nickname}
                   </Text>
                   <Text
                     style={{
@@ -90,7 +126,7 @@ const Find = () => {
                       color: "#999",
                     }}
                   >
-                    3 days ago
+                    {moment(item.created_at).fromNow()}
                   </Text>
                 </View>
                 <Text
@@ -100,7 +136,7 @@ const Find = () => {
                     marginVertical: 5,
                   }}
                 >
-                  《Heelodsds》
+                  《{item?.book?.bookName}》
                 </Text>
                 <Text
                   style={{
@@ -109,7 +145,7 @@ const Find = () => {
                     lineHeight: 2 * fontSize,
                   }}
                 >
-                  ahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjsahdsjhdsjshjs4466
+                  {item.review}
                 </Text>
               </View>
               <View
@@ -122,7 +158,6 @@ const Find = () => {
           );
         })}
       </ScrollView>
-      
     </View>
   );
 };
@@ -159,6 +194,21 @@ const styles = StyleSheet.create({
     elevation: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  emptyState: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  emptyImage: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  emptyText: {
+    color: "#999",
+    textAlign: "center",
   },
 });
 

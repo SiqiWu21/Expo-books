@@ -1,6 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserinfo } from "../redux/reducers/userinfoSlice";
+import { updateBookData } from "../redux/reducers/bookDataSlice";
+import { updateType } from "../redux/reducers/typeSlice";
+import { updateReviewData } from "../redux/reducers/reviewDataSlice";
+import { updateFontSize } from "../redux/reducers/fontSizeSlice";
 import { useNavigation } from "@react-navigation/native";
 import { Card, Button, Avatar, List } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,8 +22,6 @@ export default function My() {
   const fontSize = useSelector((state) => {
     return state.fontSize.fontSize;
   });
-  console.log("userinfo = ", userinfo);
-
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -83,13 +85,23 @@ export default function My() {
           mode="contained"
           onPress={async () => {
             dispatch(updateUserinfo(null));
+            dispatch(updateBookData([]));
+            dispatch(updateFontSize(14));
+            dispatch(updateReviewData([]));
+            dispatch(updateType([]));
             await AsyncStorage.removeItem("userinfo");
             navigation.replace("Login");
           }}
         >
-          <Text style={[{
-            fontSize
-          }]}> Log out</Text>
+          <Text
+            style={[
+              {
+                fontSize,
+              },
+            ]}
+          >
+            Log out
+          </Text>
         </Button>
       </View>
     </View>

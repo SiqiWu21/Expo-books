@@ -88,7 +88,9 @@ const Index = () => {
   }, [userinfo]);
 
   useEffect(() => {
-    getBookData();
+    if (userinfo) {
+      getBookData();
+    }
   }, [typeData]);
 
   useEffect(() => {
@@ -118,6 +120,9 @@ const Index = () => {
             Type
           </Text>
           <View style={styles.typeContainer}>
+            {typeData.length == 0 && (
+              <Text style={[styles.emptyText, { fontSize }]}>no type</Text>
+            )}
             {typeData.map((item, index) => {
               return (
                 <TouchableOpacity

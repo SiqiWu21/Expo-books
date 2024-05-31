@@ -45,6 +45,7 @@ exports.destroy = async (req, res, next) => {
 // Query
 exports.index = async (req, res) => {
     const userId = req.auth.id;
+    console.log("userId = ", userId)
     const data = await sequelize.models.type.findAll({
         where: {
             userId
