@@ -26,25 +26,25 @@ Expo-books-app is a mobile application developed using React Native and Expo. It
 - Search for books
 - Responsive design for various screen sizes
 
+
 ## Installation
 
-### Frontend
+### Frontend (expo-books-app)
 
 Follow these steps to set up the project on your local machine:
 
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/expo-books-app.git
+   git clone https://github.com/SiqiWu21/expo-books-app.git
    cd expo-books-app
    ```
 
-2. **Install dependencies:**
-
-   Make sure you have [Node.js](https://nodejs.org/) and [Yarn](https://yarnpkg.com/) installed.
+2. **Navigate to the app directory and install dependencies:**
 
    ```bash
-   yarn install
+   cd expo-books-app/app
+   npm install
    ```
 
 3. **Set up Expo CLI:**
@@ -55,48 +55,34 @@ Follow these steps to set up the project on your local machine:
    npm install -g expo-cli
    ```
 
-4. **Start the development server:**
+4. **Start the Expo development server:**
 
    ```bash
-   expo start
+   npm start
    ```
 
-### Backend
+### Backend (expo-books-server)
 
-Navigate to the `expo-books-server` directory and follow these steps:
-
-1. **Install dependencies:**
+1. **Navigate to the server directory and install dependencies:**
 
    ```bash
-   cd expo-books-server
-   yarn install
+   cd expo-books-app/expo-books-server
+   npm install
    ```
+   
 
-2. **Configure environment variables:**
-
-   Create a `.env` file in the `expo-books-server` directory and add your database configuration and other environment variables.
-
-   ```env
-   DB_HOST=your_database_host
-   DB_USER=your_database_user
-   DB_PASS=your_database_password
-   DB_NAME=your_database_name
-   JWT_SECRET=your_jwt_secret
-   ```
-
-3. **Run database migrations:**
+2. **Run database migrations:**
 
    Ensure your database is set up with the provided SQL file `expo_books_2024-05-31.sql`.
 
    ```bash
-   # Assuming you are using a MySQL database
-   mysql -u your_database_user -p your_database_name < expo_books_2024-05-31.sql
+   mysql -u your_database_user -p expo_books < /mnt/data/Expo-books-main/expo_books_2024-05-31.sql
    ```
 
-4. **Start the backend server:**
+3. **Start the backend server in development mode:**
 
    ```bash
-   yarn start
+   npm run dev
    ```
 
 ## Usage
